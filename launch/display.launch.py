@@ -1,27 +1,33 @@
+import os
 from ament_index_python.packages import get_package_share_path
-
 from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument
 from launch.conditions import IfCondition, UnlessCondition
 from launch.substitutions import Command, LaunchConfiguration
 
 from launch_ros.actions import Node
-from launch_ros.parameter_descriptions import ParameterValue
+#from launch_ros.parameter_descriptions import ParameterValue
+
+from launch_ros.parameters_type import ParameterValue
 
 def generate_launch_description():
+
     urdf_tutorial_path = get_package_share_path('urdf_tutorial')
-    default_model_path = urdf_tutorial_path / 'urdf/01-myfirst.urdf'
-    default_rviz_config_path = urdf_tutorial_path / 'rviz/urdf.rviz'
+    default_model_path = os.path.join(urdf_tutorial_path, 'urdf/01-myfirst.urdf')
+    #default_rviz_config_path = urdf_tutorial_path/'rviz/urdf.rviz'
+    default_rviz_config_path = os.path.join(urdf_tutorial_path,'rviz/urdf.rviz')
 
     gui_arg = DeclareLaunchArgument(name='gui', default_value='true', choices=['true', 'false'],
                                     description='Flag to enable joint_state_publisher_gui')
-    model_arg = DeclareLaunchArgument(name='model', default_value=str(default_model_path),
+    model_arg = DeclareLaunchArgument(name='model', default_value=default_model_path,
                                       description='Absolute path to robot urdf file')
-    rviz_arg = DeclareLaunchArgument(name='rvizconfig', default_value=str(default_rviz_config_path),
+    rviz_arg = DeclareLaunchArgument(name='rvizconfig', default_value=default_rviz_config_path,
                                      description='Absolute path to rviz config file')
 
-    robot_description = ParameterValue(Command(['xacro ', LaunchConfiguration('model')]),
-                                       value_type=str)
+    #robot_description = ParameterValue(Command(['xacro ', LaunchConfiguration('model')]),
+    #                                   value_type=str)
+
+    robot_description = Command(['xacro ', LaunchConfiguration('model')])
 
     robot_state_publisher_node = Node(
         package='robot_state_publisher',
